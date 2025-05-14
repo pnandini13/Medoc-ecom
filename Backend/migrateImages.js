@@ -6,10 +6,10 @@ dotenv.config();
 
 const imageMap = {
   "Paracetamol 500mg Tablets (Pack of 30)": "paracetamol.jpg",
-  "Vitamin C 1000mg Effervescent Tablets (Pack of 20)": "vitamin c.jpg",
+  "Vitamin C 1000mg Effervescent Tablets (Pack of 20)": "vitamin c.jpeg",
   "Omron Blood Pressure Monitor": "omron bpm.jpg",
   "Cetirizine Hydrochloride 10mg Tablets (Pack of 14)": "cetrizine.jpg",
-  "Fish Oil Omega-3 Capsules (120 Capsules)": "fish oil.jpg",
+  "Fish Oil Omega-3 Capsules (120 Capsules)": "fish oil o3.jpg",
   "Thermometer Digital with Fever Alarm": "thermometer.jpg",
   "Ibuprofen 400mg Tablets (Pack of 16)": "ibuprofen.jpg",
   "Probiotic Capsules for Gut Health (60 Capsules)": "Probiotic capsule.jpg",

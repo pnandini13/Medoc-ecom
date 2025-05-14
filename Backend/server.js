@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/Ecommerce_Users")
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/Ecommerce_Users")
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
