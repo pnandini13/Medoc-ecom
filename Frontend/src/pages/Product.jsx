@@ -1,33 +1,36 @@
 import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import axios from "axios";
 import toast from "react-hot-toast";
-import {useNavigate} from "react-router-dom";
 
 const Product = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingSimilar, setLoadingSimilar] = useState(true);
   const dispatch = useDispatch();
-
   const addProduct = (product) => {
     dispatch(addCart(product));
     toast.success("Added to cart");
+  };
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return process.env.REACT_APP_API_BASE_URL + '/images/placeholder-product.jpg';
+    if (imagePath.startsWith('http')) return imagePath;
+    return process.env.REACT_APP_API_BASE_URL + imagePath;
   };
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        // Fetch main product
         const productResponse = await axios.get(`http://localhost:3001/api/products/${id}`);
         const productData = productResponse.data.data || productResponse.data;
         
@@ -37,7 +40,6 @@ const Product = () => {
 
         setProduct(productData);
         
-        // Fetch similar products
         try {
           const similarResponse = await axios.get(
             `http://localhost:3001/api/products?category=${productData.category}&limit=4`
@@ -53,7 +55,7 @@ const Product = () => {
       } catch (err) {
         toast.error("Failed to fetch product details");
         console.error("Error fetching product:", err);
-        navigate('/products'); // Redirect if product not found
+        navigate('/products');
       } finally {
         setLoading(false);
         setLoadingSimilar(false);
@@ -61,28 +63,40 @@ const Product = () => {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, navigate]);
 
-  const Loading = () => {
-    return (
-      <div className="container my-5 py-2">
-        <div className="row">
-          <div className="col-md-6 py-3">
-            <Skeleton height={400} width={400} />
-          </div>
-          <div className="col-md-6 py-5">
-            <Skeleton height={30} width={250} />
-            <Skeleton height={90} />
-            <Skeleton height={40} width={70} />
-            <Skeleton height={50} width={110} />
-            <Skeleton height={120} />
-            <Skeleton height={40} width={110} inline={true} />
-            <Skeleton className="mx-3" height={40} width={110} />
-          </div>
+  // Loading Component
+  const Loading = () => (
+    <div className="container my-5 py-2">
+      <div className="row">
+        <div className="col-md-6 py-3">
+          <Skeleton height={400} width={400} />
+        </div>
+        <div className="col-md-6 py-5">
+          <Skeleton height={30} width={250} />
+          <Skeleton height={90} />
+          <Skeleton height={40} width={70} />
+          <Skeleton height={50} width={110} />
+          <Skeleton height={120} />
+          <Skeleton height={40} width={110} inline={true} />
+          <Skeleton className="mx-3" height={40} width={110} />
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+
+  // LoadingSimilar Component
+  const LoadingSimilar = () => (
+    <div className="my-4 py-4">
+      <div className="d-flex">
+        {[...Array(4)].map((_, index) => (
+          <div key={index} className="mx-4">
+            <Skeleton height={400} width={250} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const ShowProduct = () => {
     if (!product) {
@@ -95,12 +109,12 @@ const Product = () => {
           <div className="col-md-6 col-sm-12 py-3">
             <img
               className="img-fluid"
-              src={product.image || '/placeholder-product.jpg'}
+              src={product.image}
               alt={product.title}
               width="400px"
               height="400px"
               onError={(e) => {
-                e.target.src = '/placeholder-product.jpg';
+                e.target.src = getImageUrl('/images/placeholder-product.jpg');
               }}
             />
           </div>
@@ -130,24 +144,8 @@ const Product = () => {
     );
   };
 
-  const LoadingSimilar = () => {
-    return (
-      <div className="my-4 py-4">
-        <div className="d-flex">
-          {[...Array(4)].map((_, index) => (
-            <div key={index} className="mx-4">
-              <Skeleton height={400} width={250} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   const ShowSimilarProduct = () => {
-    if (similarProducts.length === 0) {
-      return null; // Don't show section if no similar products
-    }
+    if (similarProducts.length === 0) return null;
 
     return (
       <div className="py-4 my-4">
@@ -157,11 +155,11 @@ const Product = () => {
             <div key={item._id} className="card mx-2 mb-4" style={{ width: '18rem' }}>
               <img
                 className="card-img-top p-3"
-                src={item.image || '/placeholder-product.jpg'}
+                src={getImageUrl(item.image)}
                 alt={item.title}
                 height={200}
                 onError={(e) => {
-                  e.target.src = '/placeholder-product.jpg';
+                  e.target.src = getImageUrl('/images/placeholder-product.jpg');
                 }}
               />
               <div className="card-body text-center">
